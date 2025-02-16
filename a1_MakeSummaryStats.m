@@ -395,3 +395,9 @@ disp(pa)
 ye = T1.HowManyYearsHaveYouBeenReadingEEGsincludingDuringClinicalNeurop;
 disp('Years experience: min, max, median')
 disp([min(ye) max(ye) median(ye)])
+
+%% save for python
+
+T1_struct = struct(T1);
+T2_struct = struct(T2);
+save('Data_struct.mat', 'T1_struct', 'T2_struct', 'difficulty');
