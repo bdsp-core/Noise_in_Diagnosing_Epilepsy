@@ -1,5 +1,13 @@
 # Noise in Diagnosing Epilepsy
 
+
+## Published on bdsp.io
+
+- **Project:** https://bdsp.io/content/61d040ynxbnnerpvbnt8/1.0.0/
+- **DOIs:** [10.60508/zhep-m488](https://doi.org/10.60508/zhep-m488) (v1.0.0) · [10.60508/rjkx-x640](https://doi.org/10.60508/rjkx-x640) (core)
+- **Paper:** Nascimento FA, et al. *Noise in the diagnosis of epilepsy by experts.* Epileptic Disorders 2026. [10.1002/epd2.70181](https://doi.org/10.1002/epd2.70181)
+
+
 Code and data accompanying our paper on inter- and intra-rater noise in the diagnosis of epilepsy. The analysis decomposes variability in expert diagnostic judgments into interpretable components — signal, between-expert bias, expert-by-case interaction, and within-expert inconsistency — using a Bayesian hierarchical model, and computes supporting summary agreement statistics.
 
 ## Study design
