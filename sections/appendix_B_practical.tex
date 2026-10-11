@@ -1,0 +1,155 @@
+\section*{Appendix B: How to Use This Method in Practice}\label{section-practical-guide}
+
+This section provides step-by-step guidance for applied researchers on implementing the noise decomposition framework.
+
+\subsection*{Step 1: Prepare the Response Matrix}
+
+Organize your data as a three-dimensional array (or long-format data frame):
+\begin{itemize}
+    \item \textbf{Cases (i):} Rows represent distinct cases, patients, or items to be rated
+    \item \textbf{Raters (j):} Columns represent individual raters or experts
+    \item \textbf{Occasions (t):} If available, include repeated ratings of the same case by the same rater
+    \item \textbf{Missing data:} The Bayesian framework handles missing data naturally; not all raters need to rate all cases
+\end{itemize}
+
+\subsection*{Step 2: Choose Outcome Coding}
+
+For binary outcomes:
+\begin{itemize}
+    \item Code positive/yes/present as 1, negative/no/absent as 0
+    \item \textbf{Handling "unsure" or "indeterminate":} Common approaches include:
+    \begin{enumerate}
+        \item Collapse "unsure" to 0 (conservative for diagnosis)
+        \item Collapse "unsure" to 1 (sensitive for screening)
+        \item Treat as missing data (if infrequent)
+        \item Use an ordinal model (see Extensions section)
+    \end{enumerate}
+    Document your choice and justify it based on the clinical context.
+\end{itemize}
+
+\subsection*{Step 3: Fit the Model}
+
+\subsubsection*{Using PyMC (Python):}
+\begin{verbatim}
+import pymc as pm
+import numpy as np
+
+# Assume data: Y[i,j,t] is response matrix
+# N cases, M raters, T occasions
+
+with pm.Model() as model:
+    # Priors on standard deviations
+    sigma_c = pm.HalfNormal('sigma_c', sigma=2)
+    sigma_l = pm.HalfNormal('sigma_l', sigma=2)
+    sigma_p = pm.HalfNormal('sigma_p', sigma=2)
+    sigma_o = pm.HalfNormal('sigma_o', sigma=1)
+
+    # Non-centered parameterization
+    z_c = pm.Normal('z_c', 0, 1, shape=N)
+    z_l = pm.Normal('z_l', 0, 1, shape=M)
+    z_p = pm.Normal('z_p', 0, 1, shape=(N,M))
+    z_o = pm.Normal('z_o', 0, 1, shape=(N,M,T))
+
+    c = pm.Deterministic('c', sigma_c * z_c)
+    l = pm.Deterministic('l', sigma_l * z_l)
+    p = pm.Deterministic('p', sigma_p * z_p)
+    o = pm.Deterministic('o', sigma_o * z_o)
+
+    # Intercept
+    ybar = pm.Normal('ybar', 0, 2)
+
+    # Linear predictor
+    z = c[i_idx] + l[j_idx] + p[i_idx,j_idx] + o[i_idx,j_idx,t_idx] + ybar
+
+    # Likelihood
+    Y_obs = pm.Bernoulli('Y_obs', logit_p=z, observed=Y_flat)
+
+    # Sample
+    trace = pm.sample(2000, tune=2000, chains=4, target_accept=0.98)
+\end{verbatim}
+
+\subsubsection*{Using R (lme4 for approximate ML):}
+For a simplified model without occasion noise:
+\begin{verbatim}
+library(lme4)
+# Data in long format with columns: case_id, rater_id, response
+fit <- glmer(response ~ (1|case_id) + (1|rater_id) + (1|case_id:rater_id),
+             data=dat, family=binomial(link="logit"))
+\end{verbatim}
+
+Note: \texttt{lme4} provides point estimates; for full uncertainty quantification, use Bayesian methods.
+
+\subsection*{Step 4: Check Convergence and Model Fit}
+
+\textbf{Convergence diagnostics (Bayesian):}
+\begin{itemize}
+    \item $\hat{R} < 1.01$ for all parameters
+    \item Effective sample size $> 400$ per chain
+    \item Visual inspection of trace plots (should resemble "fuzzy caterpillars")
+\end{itemize}
+
+\textbf{Posterior predictive checks:}
+\begin{itemize}
+    \item Compare observed vs. predicted response frequencies by case
+    \item Compare observed vs. predicted response frequencies by rater
+    \item If $T \geq 2$: Compare observed vs. predicted switch rates between occasions
+    \item Examine residual patterns for systematic deviations
+\end{itemize}
+
+\subsection*{Step 5: Report Results}
+
+\textbf{Minimal reporting checklist:}
+\begin{table}[h!]
+\centering
+\small
+\begin{tabular}{p{0.4\textwidth}p{0.5\textwidth}}
+\toprule
+\textbf{Item} & \textbf{What to Report} \\
+\midrule
+Sample sizes & $N$ cases, $M$ raters, $T$ occasions, \% missing data \\
+Model specification & Link function (logit/probit), which variance components included \\
+Priors (if Bayesian) & Distributions and hyperparameters for $\sigma$ parameters \\
+Convergence & $\hat{R}$ values, effective sample sizes, convergence plots \\
+Variance estimates & Posterior means (or MLEs) and 95\% credible (or confidence) intervals for $\sigma_c, \sigma_\ell, \sigma_p, \sigma_o$ \\
+Percent contributions & \% of total variance from each component with uncertainty \\
+Model validation & Posterior predictive check results or goodness-of-fit statistics \\
+Code availability & Link to GitHub repository or supplementary code \\
+\bottomrule
+\end{tabular}
+\caption{Minimal reporting checklist for noise decomposition studies.}
+\label{tab:reporting}
+\end{table}
+
+\subsection*{Interpretation Pitfalls to Avoid}
+
+\begin{enumerate}
+    \item \textbf{Don't confuse latent-scale and probability-scale variance.} Variance components are on the logit scale. To interpret on the probability scale, use posterior predictive simulation.
+
+    \item \textbf{Don't ignore prevalence effects.} If cases are highly imbalanced (e.g., 90\% positive), variance estimates may be influenced by ceiling/floor effects.
+
+    \item \textbf{Don't assume high agreement means low noise.} A group of raters with similar biases (high level noise, low pattern noise) may show high agreement but poor accuracy.
+
+    \item \textbf{Don't over-interpret small differences in percent contributions.} Check whether credible/confidence intervals overlap before concluding that one noise source dominates.
+
+    \item \textbf{Beware of rater selection bias.} If raters were selected non-randomly (e.g., "problem" raters excluded), estimates of $\sigma_\ell$ and $\sigma_p$ may underestimate true population variability.
+\end{enumerate}
+
+\subsection*{Study Design Guidance}
+
+\textbf{How many cases and raters do I need?}
+
+Based on simulation studies: 
+\begin{itemize}
+    \item \textbf{Minimum for stable estimates:} $N \geq 30$ cases, $M \geq 10$ raters
+    \item \textbf{For precise pattern noise estimation:} $N \geq 50$ cases, $M \geq 20$ raters
+    \item \textbf{For occasion noise:} $T \geq 2$ occasions for at least 30\% of case-rater pairs
+    \item \textbf{Power for group comparisons:} To detect a 20\% difference in $\sigma$ between two rater groups, aim for $M \geq 15$ raters per group
+\end{itemize}
+
+\textbf{When is replication (T > 1) worth the cost?}
+\begin{itemize}
+    \item If occasion noise is a key research question: yes
+    \item If raters are scarce but cases are abundant: replicate a subset (e.g., 20\% of cases rated twice)
+    \item If costs are low (e.g., automated re-reading): replicate everything
+\end{itemize}
+

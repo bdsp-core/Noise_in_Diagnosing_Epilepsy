@@ -1,0 +1,23 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\begin{document}
+
+Test of boxed equation:
+\begin{equation}
+\label{eq:test}
+\boxed{
+\begin{aligned}
+Y_{ijt} &\sim \text{Bernoulli}(\pi_{ijt}) \\
+\text{logit}(\pi_{ijt}) &= c_i + \ell_j + p_{ij} + o_{ijt} + \bar{y}
+\end{aligned}
+}
+\end{equation}
+
+Test of fbox minipage:
+\fbox{\begin{minipage}{0.95\textwidth}
+\textbf{Key Point:} This is a test.
+\end{minipage}}
+
+\end{document}

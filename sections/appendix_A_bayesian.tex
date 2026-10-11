@@ -1,0 +1,27 @@
+\section*{Appendix A: Bayesian Estimation Details}\label{section-estimation}
+
+The observed expert responses $y_{ijt}$ are binary (yes/no), while the underlying (unobserved) signal and noise are continuous, requiring a statistical approach to estimate the variance components $\sigma_c$, $\sigma_\ell$, $\sigma_p$, $\sigma_o$ from the observations.
+
+The model is a generalized linear mixed-effects model (GLMM). The underlying parameter values that must be estimated include the random effects $c_j$, $\ell_i$, $p_{ij}$, $o_{ijt}$, $\bar{y}$, and their standard deviations, $\sigma_c$, $\sigma_\ell$, $\sigma_p$, $\sigma_o$.
+
+\subsection*{Why Bayesian estimation?}
+Because of the nonlinearity of the logistic link function, the marginal likelihood (obtained by integrating out the latent variables) is analytically intractable. While maximum likelihood estimation via Laplace approximation is possible using standard software (e.g., \texttt{lme4} in R, \texttt{glmmTMB}), we adopt a fully Bayesian approach using Markov chain Monte Carlo (MCMC) sampling because it provides full posterior distributions for all parameters (enabling proper uncertainty quantification), handles the complex hierarchical structure without approximation, allows for flexible prior specification to improve identifiability, and enables posterior predictive checks for model validation.
+
+\subsection*{Implementation details}
+We place weakly informative half-normal priors on the variance parameters $\sigma_c$, $\sigma_\ell$, $\sigma_p$, and $\sigma_o$. To improve MCMC sampling efficiency in this hierarchical model, we adopt a non-centered parameterization. For example, the case effect is reparameterized as $z_{c,j} \sim \mathcal{N}(0,1)$ and $c_j = \sigma_c z_{c,j}$, with analogous formulations for $\ell_i$, $p_{ij}$, and $o_{ijt}$. This reparameterization addresses the funnel-shaped geometry common in hierarchical models and improves sampling efficiency.
+
+We employ the No-U-Turn Sampler (NUTS) as implemented in PyMC with NumPyro backend. Our sampling configuration uses 4 parallel chains, 2,000 tuning (warmup) iterations per chain, 2,000 post-tuning draws per chain, and a target acceptance rate of 0.98.
+
+Convergence is assessed using standard diagnostics: $\hat{R}$ statistics (should be $<1.01$), effective sample size (should be $>400$ per chain), and visual inspection of trace plots.
+
+\textbf{Computational considerations.} The full KSS model scales with the number of case--rater--occasion combinations (approximately $O(N \times M \times T)$). For very large studies, computational burden may motivate fitting reduced models (e.g., LTM with a single combined noise term) or restricting repeated measurements to a subset of cases or raters. These simplifications preserve the core signal--noise separation while improving scalability.
+
+\subsection*{Variance decomposition from posterior samples}
+After obtaining the posterior distributions, we compute posterior means and credible intervals for the standard deviation parameters. The percentage of total variance explained by each component is:
+\begin{eqnarray*}
+\text{\% Component} = \frac{\sigma^2_{\text{component}}}{\sigma^2_c + \sigma^2_\ell + \sigma^2_p + \sigma^2_o} \times 100
+\end{eqnarray*}
+Credible intervals for these percentages are computed from the posterior samples.
+
+The accompanying GitHub repository contains the \textbf{reference implementation} used to generate all figures, tables, and analyses reported in this manuscript, including data preprocessing, model fitting, posterior predictive checks, and figure generation. The code snippets in this appendix are illustrative; the repository provides the complete, versioned workflow: (GITHUB LINK).
+

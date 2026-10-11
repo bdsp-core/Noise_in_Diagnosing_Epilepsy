@@ -1,0 +1,3 @@
+
+# large analysis pickles (8.6 GB) are not for GitHub
+code/spikes_analysis_output/*.pkl

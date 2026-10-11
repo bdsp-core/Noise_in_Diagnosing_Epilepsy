@@ -1,0 +1,108 @@
+\documentclass[num-refs]{wiley-article}
+
+\usepackage{graphicx}
+\usepackage[space]{grffile}
+\usepackage{latexsym}
+\usepackage{textcomp}
+\usepackage{longtable}
+\usepackage{tabulary}
+\usepackage{booktabs,array,multirow}
+\usepackage{amsfonts,amsmath,amssymb}
+\usepackage{natbib}
+\usepackage{url}
+\usepackage{hyperref}
+\hypersetup{colorlinks=false,pdfborder={0 0 0}}
+% You can conditionalize code for latexml or normal latex using this.
+\newif\iflatexml\latexmlfalse
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}%
+
+\AtBeginDocument{\DeclareGraphicsExtensions{.pdf,.PDF,.eps,.EPS,.png,.PNG,.tif,.TIF,.jpg,.JPG,.jpeg,.JPEG}}
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+
+% Add any additional LaTeX packages and macros here
+\usepackage{siunitx}
+\usepackage{placeins}
+\usepackage{xcolor}
+\usepackage{float}
+
+% Define command for Fabio's comments in red
+\newcommand{\fabio}[1]{\textcolor{red}{[#1]}}
+
+%---
+
+\iflatexml
+% Add any LateXML specific commands here
+
+%---
+
+\else
+% The commands below will only change the exported PDF. Edit or remove as needed
+
+\paperfield{Clinical Neurology}
+\abbrevs{GLMM, generalized linear mixed model; KSS, Kahneman-Sibony-Sunstein; LTM, latent trait model; MCMC, Markov chain Monte Carlo.}
+\corraddress{M. Brandon Westover MD PhD, Department of Neurology, Massachusetts General Hospital, Harvard Medical School, Boston, MA, USA}
+\corremail{mwestover@mgh.harvard.edu}
+\fundinginfo{National Institutes of Health, Grant/Award Numbers: R01AG073410, R01HL161253, R01NS126282, R01AG073598, R01NS131347, R01NS130119}
+\fi
+
+%---
+
+\papertype{Original Article}
+
+\title{How to Analyze Noise in Medical Decision Making}
+
+\author[1]{Fábio A. Nascimento}
+\affil[1]{Washington University School of Medicine in St. Louis}
+
+\author[1]{Xuming He}
+\affil[1]{Washington University School of Medicine in St. Louis}
+
+\author[2]{Jin Jing}
+\affil[2]{Harvard Medical School}
+
+\author[2]{M. Brandon Westover}
+\affil[2]{Harvard Medical School}
+
+\runningauthor{M. Brandon Westover}
+
+\begin{document}
+
+\raggedbottom  % Prevent LaTeX from stretching vertical space to fill pages
+
+\maketitle
+\selectlanguage{english}
+
+\begin{abstract}
+\textbf{Background:} When multiple clinicians evaluate the same cases, disagreement arises from various forms of noise: differences between-clinicians in systematic biases (level noise), idiosyncratic case-by-rater interactions (pattern noise), and within-clinician inconsistency (occasion noise). The observed variation in responses across cases reflects both the underlying signal (genuine differences between cases) and these noise sources. Traditional reliability metrics collapse all disagreement into a single number, preventing identification of specific noise sources.
+
+\textbf{Methods:} We present a unified statistical framework for decomposing variation in binary medical decisions. We show that the latent trait model (LTM) and the Kahneman-Sibony-Sunstein (KSS) noise decomposition are special cases of a generalized linear mixed model. We use Bayesian estimation via Markov chain Monte Carlo to obtain posterior distributions for all variance components and their relative contributions. We demonstrate the approach using data from epilepsy diagnosis and EEG interictal epileptiform discharge (IED) classification.
+
+\textbf{Results:} In an epilepsy diagnosis study with 20 board-certified epileptologists reviewing 50 cases on two occasions, system noise (level + pattern + occasion) accounted for 31-34\% of total variation. Based on clinical history alone, level noise (systematic bias) was the dominant component (23\%). After incorporating EEG and neuroimaging results, pattern noise (idiosyncratic case interpretations) became dominant (24\%), while level noise decreased to 5\%. Occasion noise remained minimal (1\%) despite 16\% of cases showing diagnostic reversals between occasions. Diagnostic accuracy was 71\% overall, but only 56\% for difficult cases.
+
+\textbf{Conclusions:} The noise decomposition framework provides actionable insights into sources of diagnostic disagreement. By separating level, pattern, and occasion noise, researchers can design targeted interventions (e.g., threshold calibration for level noise, case-based training for pattern noise, decision aids for occasion noise). We provide practical guidance on sample size requirements, model implementation, and interpretation for applied medical researchers.
+
+\textbf{Keywords} --- inter-rater reliability, noise decomposition, signal detection theory, generalized linear mixed models, Bayesian hierarchical models, diagnostic disagreement%
+\end{abstract}
+
+% Main content sections
+\input{sections/01_introduction}
+\input{sections/02_methods}
+\input{sections/03_case_study}
+\input{sections/04_discussion}
+\input{sections/05_conclusion}
+
+% Appendices
+\input{sections/appendix_A_bayesian}
+\input{sections/appendix_B_practical}
+
+% Back matter
+\input{sections/99_backmatter}
+
+\selectlanguage{english}
+\FloatBarrier
+\bibliographystyle{plain}
+\bibliography{bibliography/converted_to_latex}
+
+\end{document}

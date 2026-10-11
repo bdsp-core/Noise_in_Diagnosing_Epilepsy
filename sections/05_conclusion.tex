@@ -1,0 +1,39 @@
+\section*{Discussion}
+
+Reliability in expert judgment is not a single number---it is a system property with multiple failure modes. Traditional metrics such as Cohen's kappa or the intraclass correlation coefficient quantify \textit{how much} experts disagree, but not \textit{why}. A kappa of 0.65 indicates moderate agreement, yet provides no insight into whether disagreement stems from misaligned diagnostic thresholds, idiosyncratic interpretation of clinical features, or temporal inconsistency within individual raters. Each of these sources requires fundamentally different interventions.
+
+The unified framework presented here addresses this limitation by decomposing total disagreement into actionable variance components: level noise ($\sigma_\ell^2$) quantifies systematic threshold differences across raters; pattern noise ($\sigma_p^2$) captures idiosyncratic interpretation of specific cases; and occasion noise ($\sigma_o^2$) measures within-rater inconsistency over time. This decomposition is not merely descriptive---it directly informs targeted quality improvement strategies, as detailed in the intervention roadmap (Table~\ref{tab:intervention-roadmap}).
+
+\subsection*{Relationship to Existing Reliability Metrics}
+
+Our approach builds upon and extends traditional reliability frameworks. Cohen's kappa and Fleiss' kappa provide useful baseline measures of overall agreement, but do not partition disagreement into specific sources \cite{Kahneman2021}. We recommend reporting kappa alongside noise decomposition: kappa quantifies the magnitude of the problem, while variance components identify which interventions will be most effective. 
+
+The intraclass correlation coefficient (ICC) corresponds to the signal-to-total-variance ratio in our framework: $\sigma_c^2 / (\sigma_c^2 + \sigma_\ell^2 + \sigma_p^2 + \sigma_o^2)$. While ICC is appropriate when only total reliability matters, quality improvement requires knowing whether the remaining variation arises from systematic bias (level noise), idiosyncratic interpretation (pattern noise), or random inconsistency (occasion noise).
+
+Generalizability theory (G-theory) \cite{Cronbach1972,Brennan2001,Shavelson1991} is the closest conceptual relative to our framework. Both approaches decompose variance into multiple facets. However, classical G-theory relies on ANOVA-based methods appropriate for continuous outcomes, whereas medical decisions are typically binary. Our framework uses generalized linear mixed models (GLMMs) to extend G-theory to binary data \cite{Jiang2018}, while maintaining explicit connections to signal detection theory and item response theory. The correspondence is direct: the G-theory "universe score" maps to our case signal ($c_i$), the "rater facet" corresponds to level noise ($\ell_j$), the "rater $\times$ item interaction" corresponds to pattern noise ($p_{ij}$), and the "residual" corresponds to occasion noise ($o_{ijt}$).
+
+\subsection*{Practical Implications: The Information Shift}
+
+The epilepsy case study illustrates why decomposition matters for quality improvement. When experts moved from clinical history alone to a full diagnostic workup including EEG and neuroimaging, traditional metrics showed modest improvement (kappa increased from 0.33 to 0.52). This would suggest the intervention worked. However, the variance decomposition revealed that total noise barely changed (34\% to 31\%), but the \textit{source} of disagreement fundamentally shifted: level noise decreased from 23\% to 5\%, while pattern noise increased from 10\% to 24\%.
+
+This "information shift" demonstrates that adding objective diagnostic tests does not eliminate disagreement---it transforms the problem from threshold miscalibration to feature interpretation. Without noise decomposition, quality improvement teams might conclude that "more testing" improves reliability and pursue further test development. The variance components reveal a different prescription: Stage 1 requires threshold calibration (e.g., consensus guidelines on diagnostic criteria), whereas Stage 2 requires feature standardization (e.g., training on EEG morphology interpretation, potentially supplemented by AI-assisted feature detection).
+
+\subsection*{Methodological Contributions}
+
+This framework unifies three previously separate reliability paradigms---item response theory, social signal interpretation theory, and the Kahneman-Sibony-Sunstein noise framework---as special cases of a single generalized linear mixed model (Equation~\ref{eq:master-model}). This unification provides a common statistical foundation for measuring reliability across diverse domains, from radiology to psychiatry to forensic science.
+
+The Bayesian implementation offers additional advantages. Uncertainty quantification through posterior distributions enables principled comparison of variance components, while hierarchical shrinkage provides stable estimates even with modest sample sizes. Posterior predictive checks validate model assumptions by comparing observed data patterns to model-generated predictions.
+
+\subsection*{Limitations and Future Directions}
+
+Several limitations warrant consideration. First, the framework assumes that disagreement can be meaningfully partitioned into the three noise types. In practice, these components may interact in complex ways not captured by the additive variance structure. Second, the binary outcome model may oversimplify clinical judgment when diagnostic confidence varies continuously. Extensions to ordinal or continuous outcomes would broaden applicability.
+
+Third, our case study involved a selected set of cases evaluated under controlled experimental conditions. Real-world diagnostic reliability may differ due to factors such as time pressure, incomplete information, or variations in case presentation format. Prospective studies embedding noise audits into routine clinical workflows would provide more ecologically valid estimates.
+
+Fourth, while we demonstrated the framework in epilepsy diagnosis, validation across diverse medical specialties is needed. Different domains may exhibit different noise profiles, and the optimal intervention strategies may vary accordingly. We encourage researchers to apply this framework to their own reliability studies and contribute to a growing evidence base on domain-specific noise patterns.
+
+Finally, the framework identifies sources of disagreement but does not directly address whether any particular expert judgment is correct. High agreement does not guarantee accuracy if all experts share the same systematic bias. Future work should integrate noise decomposition with measures of calibration against established reference standards.
+
+\subsection*{Conclusions}
+
+For researchers seeking to improve expert consensus in medical diagnosis, the relevant question is not "How reliable are my experts?" but rather "What type of unreliability do I have, and what intervention will address it?" This framework provides both the measurement tool and the intervention roadmap to answer that question. By transforming reliability measurement from a descriptive statistic into a diagnostic instrument, variance decomposition enables evidence-based quality improvement in expert judgment.
